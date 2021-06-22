@@ -59,7 +59,8 @@ public class SamplePlayer : MonoBehaviour
     {
         StopCoroutine(currentState);
 
-        currenState = nextState;
+        currentState = nextState;
+
         StartCoroutine(currentState);
     }
 
@@ -85,20 +86,23 @@ public class SamplePlayer : MonoBehaviour
             }
             yield return null;
         }
-        }
     }
 
     private void CheckRotation()
     {
-        Vector3 playerRotation = transform.rotation.eulerAngles;
-        playerRotation.y = Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime;
+    Vector3 playerRotation = transform.localRotation.eulerAngles;
 
-        transform.rotation = Quaternion.Euler(playerRotation);
+    playerRotation += new Vector3(1.2f, 1.5f, 0);
 
-        Vector3 cameraRotation = playerCamera.transform.rotation.eulerAngles;
-        cameraRotation.x += Input.GetAxis("Mouse Y") * rotatingSpeed * Time.deltaTime;
+    playerRotation.y = Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime;
 
-        playerCamera.transform.rotation = Quaternion.Euler(cameraRotation);
+    transform.localRotation = Quaternion.Euler(playerRotation);
+
+    Vector3 cameraRotation = playerCamera.transform.rotation.eulerAngles;
+
+    cameraRotation.x += Input.GetAxis("Mouse Y") * rotationSpeed * Time.deltaTime;
+
+    playerCamera.transform.rotation = Quaternion.Euler(cameraRotation);
     }
 
     /// <summary>
@@ -107,7 +111,6 @@ public class SamplePlayer : MonoBehaviour
     /// <returns>True if user input is detected and player is moved.</returns>
     private bool CheckMovement()
     {
-        return false;
         Vector3 newPos = transform.position;
 
         Vector3 xMovement = transform.right * Input.GetAxis("Horizontal");
