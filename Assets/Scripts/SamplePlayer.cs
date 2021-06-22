@@ -15,20 +15,16 @@ using UnityEngine;
 
 public class SamplePlayer : MonoBehaviour
 {
-    /// <summary>
     /// The distance this player will travel per second.
-    /// </summary>
     [SerializeField]
     private float moveSpeed;
 
     [SerializeField]
     private float rotationSpeed;
 
-    /// <summary>
     /// The camera attached to the player model.
     /// Should be dragged in from Inspector.
-    /// </summary>
-    private Camera playerCamera;
+    public Camera playerCamera;
 
     private string currentState;
 
@@ -37,7 +33,7 @@ public class SamplePlayer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        nextState = "Idling";
+        nextState = "Idle";
     }
 
     // Update is called once per frame
@@ -51,10 +47,8 @@ public class SamplePlayer : MonoBehaviour
         CheckRotation();
     }
 
-    /// <summary>
     /// Sets the current state of the player
     /// and starts the correct coroutine.
-    /// </summary>
     private void SwitchState()
     {
         StopCoroutine(currentState);
@@ -68,7 +62,7 @@ public class SamplePlayer : MonoBehaviour
     {
         while(currentState == "Idle")
         {
-            if(Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") != 0)
+            if(Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
             {
                 nextState = "Moving";
             }
@@ -90,24 +84,18 @@ public class SamplePlayer : MonoBehaviour
 
     private void CheckRotation()
     {
-    Vector3 playerRotation = transform.localRotation.eulerAngles;
+        Vector3 playerRotation = transform.rotation.eulerAngles;
+        playerRotation.y += Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime;
 
-    playerRotation += new Vector3(1.2f, 1.5f, 0);
+        transform.rotation = Quaternion.Euler(playerRotation);
 
-    playerRotation.y = Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime;
+        Vector3 cameraRotation = playerCamera.transform.rotation.eulerAngles;
+        cameraRotation.x -= Input.GetAxis("Mouse Y") * rotationSpeed * Time.deltaTime;
 
-    transform.localRotation = Quaternion.Euler(playerRotation);
-
-    Vector3 cameraRotation = playerCamera.transform.rotation.eulerAngles;
-
-    cameraRotation.x += Input.GetAxis("Mouse Y") * rotationSpeed * Time.deltaTime;
-
-    playerCamera.transform.rotation = Quaternion.Euler(cameraRotation);
+        playerCamera.transform.rotation = Quaternion.Euler(cameraRotation);
     }
 
-    /// <summary>
     /// Checks and handles movement of the player
-    /// </summary>
     /// <returns>True if user input is detected and player is moved.</returns>
     private bool CheckMovement()
     {
@@ -118,7 +106,7 @@ public class SamplePlayer : MonoBehaviour
 
         Vector3 movementVector = xMovement + zMovement;
 
-        if(movementVector.sqrMagnitude > 0)
+        if (movementVector.sqrMagnitude > 0)
         {
             movementVector *= moveSpeed * Time.deltaTime;
             newPos += movementVector;
